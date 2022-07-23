@@ -1,38 +1,40 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+const express = require("express");
+const bodyParser = require('body-parser')
 
 const app = express();
 
-app.set('view engine' , 'ejs');
+app.set("view engine", "ejs");
 
-app.get("/" , (req,res)=>{
-    
-    var today  = new Date();
-    var currentDay = today.getDay();
-    var day ="";
-        if(currentDay ==1 ){
-            day = "Monday";
-        }
-        if(currentDay ==2 ){
-            day = "tuesday";
-        }if(currentDay ==3 ){
-            day = "Wedneday";
-        }if(currentDay ==4 ){
-            day = "Thursday";
-        }if(currentDay ==5 ){
-            day = "Friday";
-        }
-        if(currentDay ==6 ){
-            day = "Saturday";
-        }if(currentDay ==0){
-            day = "Sunday";
-        }
-        res.render('list' , {
-            kindOfDay : day
-        });
+app.use(bodyParser.urlencoded({ extended: false }))
 
+var inputs = [];
+var popList = [];
+
+app.get("/", (req, res) => {
+    var today = new Date();
+
+    var options = {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+    };
+    var day = today.toLocaleDateString("en-US", options);
+
+    res.render("list", { kindOfDay: day, newListItems : inputs , deleteListItems : popList});
+
+});
+app.post("/", (req, res) => {
+    var input =  req.body.inputText;
+    inputs.push(input);
+    res.redirect("/");
 })
 
-app.listen(3000 , ()=>{
+app.post("/deleteLast", (req,res)=>{
+    var popInput = inputs.pop();
+    popList.push(popInput);
+    res.redirect("/");
+})
+
+app.listen(3000, () => {
     console.log("Server started at port 3000");
-})
+});
